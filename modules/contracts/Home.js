@@ -11,7 +11,9 @@ function Home(cb, _library) {
 Home.prototype.create = function (data, trs) {
 	trs.recipientId = data.recipientId;
 	trs.asset = {
-		entry: new Buffer(data.entry, 'utf8').toString('hex') // Save entry as hex string
+		accountId: new Buffer(data.accountId, 'utf8').toString('hex'), // Save as hex string
+		deviceId: new Buffer(data.deviceId, 'utf8').toString('hex'), 
+		deviceName: new Buffer(data.deviceName, 'utf8').toString('hex')
 	};
 
 	return trs;
@@ -22,15 +24,20 @@ Home.prototype.calculateFee = function (trs) {
 }
 
 Home.prototype.verify = function (trs, sender, cb, scope) {
-	if (trs.asset.entry.length > 2000) {
-		return setImmediate(cb, "Max length of an entry is 1000 characters!");
+	/*if (trs.asset.deviceId.length > 40) {
+		return setImmediate(cb, "Max length of an device id is 20 characters!");
 	}
+	if (trs.asset.deviceName.length > 100) {
+		return setImmediate(cb, "Max length of an device name is 50 characters!");
+	}*/
 
 	setImmediate(cb, null, trs);
 }
 
 Home.prototype.getBytes = function (trs) {
-	return new Buffer(trs.asset.entry, 'hex');
+	return new Buffer(trs.asset.accountId, 'hex');
+	return new Buffer(trs.asset.deviceId, 'hex');
+	return new Buffer(trs.asset.deviceName, 'hex');
 }
 
 Home.prototype.apply = function (trs, sender, cb, scope) {
@@ -71,10 +78,12 @@ Home.prototype.ready = function (trs, sender, cb, scope) {
 
 Home.prototype.save = function (trs, cb) {
 	modules.api.sql.insert({
-		table: "asset_entries",
+		table: "asset_devices",
 		values: {
 			transactionId: trs.id,
-			entry: trs.asset.entry
+			accountId: trs.asset.accountId,
+			deviceId: trs.asset.deviceId,
+			deviceName: trs.asset.deviceName
 		}
 	}, cb);
 }
@@ -84,7 +93,9 @@ Home.prototype.dbRead = function (row) {
 		return null;
 	} else {
 		return {
-			entry: row.gb_entry
+			accountId: row.hd_accountId,
+			deviceId: row.hd_deviceId,
+			deviceName: row.hd_deviceName
 		};
 	}
 }
@@ -93,13 +104,23 @@ Home.prototype.normalize = function (asset, cb) {
 	library.validator.validate(asset, {
 		type: "object", // It is an object
 		properties: {
-			entry: { // It contains a entry property
+			accountId: { // It contains a deviceId property
+				type: "string", // It is a string
+				format: "hex", // It is in a hexadecimal format
+				minLength: 1 // Minimum length of string is 1 character
+			},
+			deviceId: { // It contains a deviceId property
+				type: "string", // It is a string
+				format: "hex", // It is in a hexadecimal format
+				minLength: 1 // Minimum length of string is 1 character
+			},
+			deviceName: { // It contains a deviceName property
 				type: "string", // It is a string
 				format: "hex", // It is in a hexadecimal format
 				minLength: 1 // Minimum length of string is 1 character
 			}
 		},
-		required: ["entry"] // Entry property is required and must be defined
+		required: ["accountId", "deviceId", "deviceName"] // deviceId&deviceName property is required and must be defined
 	}, cb);
 }
 
@@ -153,9 +174,9 @@ Home.prototype.putDevice = function (cb, query) {
 			try {
 				var transaction = library.modules.logic.transaction.create({
 					type: self.type,
+					accountId: query.accountId,
 					deviceId: query.deviceId,
 					deviceName: query.deviceName,
-					accountId: query.accountId,
 					sender: account,
 					keypair: keypair
 				});
@@ -246,7 +267,7 @@ Home.prototype.getDevices = function (cb, query) {
             accountId: {
                 type: "string",
                 minLength: 1,
-                maxLength: 21
+                maxLength: 42
             }
         },
         required: ["accountId"]
@@ -266,19 +287,20 @@ Home.prototype.getDevices = function (cb, query) {
             join: [{
                 type: 'left outer',
                 table: 'asset_devices',
-                alias: "h",
-                on: {"t.id": "h.transactionId"}
+                alias: "hd",
+                on: {"t.id": "hd.transactionId"}
             }]
-        }, ['id', 'type', 'senderId', 'senderPublicKey', 'accountId', 'amount', 'fee', 'signature', 'blockId', 'transactionId', 'deviceId', 'deviceName'], function (err, transactions) {
+        }, ['id', 'type', 'senderId', 'senderPublicKey', 'amount', 'fee', 'signature', 'blockId', 'transactionId', 'accountId', 'deviceId', 'deviceName'], function (err, transactions) {
             if (err) {
                 return cb(err.toString());
             }
 
             // Map results to asset object
-            var entries = transactions.map(function (tx) {
+            var devices = transactions.map(function (tx) {
                 tx.asset = {
                     deviceId: new Buffer(tx.deviceId, 'hex').toString('utf8'),
-                    deviceName: new Buffer(tx.deviceName, 'hex').toString('utf8')                };
+                    deviceName: new Buffer(tx.deviceName, 'hex').toString('utf8')
+                };
 
                 delete tx.deviceId;
                 delete tx.deviceName;
@@ -286,8 +308,7 @@ Home.prototype.getDevices = function (cb, query) {
             });
 
             return cb(null, {
-                deviceId: deviceId,
-                deviceName: deviceName
+                devices: devices
             })
         });
     });
@@ -301,7 +322,7 @@ Home.prototype.getFunctions = function (cb, query) {
             accountId: {
                 type: "string",
                 minLength: 1,
-                maxLength: 21
+                maxLength: 42
             }
         },
         required: ["accountId"]
@@ -321,8 +342,8 @@ Home.prototype.getFunctions = function (cb, query) {
             join: [{
                 type: 'left outer',
                 table: 'asset_functions',
-                alias: "h",
-                on: {"t.id": "h.transactionId"}
+                alias: "hf",
+                on: {"t.id": "hf.transactionId"}
             }]
         }, ['id', 'type', 'senderId', 'senderPublicKey', 'accountId', 'amount', 'fee', 'signature', 'blockId', 'transactionId', 'deviceId', 'functionId', 'deviceName'], function (err, transactions) {
             if (err) {
@@ -334,7 +355,8 @@ Home.prototype.getFunctions = function (cb, query) {
                 tx.asset = {
                     deviceId: new Buffer(tx.deviceId, 'hex').toString('utf8'),
                     functionId: new Buffer(tx.functionId, 'hex').toString('utf8'),
-                    deviceName: new Buffer(tx.deviceName, 'hex').toString('utf8')                };
+                    deviceName: new Buffer(tx.deviceName, 'hex').toString('utf8')
+                };
 
                 delete tx.deviceId;
                 delete tx.functionId;

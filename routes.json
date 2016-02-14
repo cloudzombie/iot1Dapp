@@ -77,11 +77,11 @@
 	{
 		   "path": "/get/devices",
 		   "method": "get",
-		    "handler" : "contracts.Home.getDevices"
+		   "handler" : "contracts.Home.getDevices"
 	},
 	{
-		   "path": "/entries/functions",
+		   "path": "/get/functions",
 		   "method": "get",
-		    "handler" : "contracts.Home.getFunctions"
+		   "handler" : "contracts.Home.getFunctions"
 	}
 ]
