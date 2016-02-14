@@ -61,40 +61,21 @@
       </div>
 
     <!-- 2. Choose your device -->
-      <div class="col-xs-12 col-sm-12 col-md-12">
+      <div class="col-xs-12 col-sm-12 col-md-12" id="showDevices">
         <div class="page-header">
           <h2>Devices<br><small>Which home device do you want to control?</small></h2>
         </div>
-        <form name="deviceSelect">
-          <label class="col-xs-2 radio-inline text-center">
-            <input type="radio" name="raspberryPi" id="inlineRadio1" value="1"> <img src="images/raspi.png"> <br><br><strong>Raspberry Pi</strong>
-          </label>
-          <label class="col-xs-2 radio-inline text-center">
-            <input type="radio" name="arduino" id="inlineRadio2" value="2"> <img src="images/arduino.png"><br><br><strong>Arduino</strong>
-          </label>
-          <label class="col-xs-2 radio-inline text-center">
-            <input type="radio" name="lamp" id="inlineRadio2" value="3"> <img src="images/lamp.png"><br><br><strong>Kitchen Lamp</strong>
-          </label>
-          <label class="col-xs-2 radio-inline text-center">
-            <input type="radio" name="mainDoor" id="inlineRadio2" value="4"> <img src="images/lock.png"><br><br><strong>Main Door</strong>
-          </label>
-          <label class="col-xs-2 radio-inline text-center">
-            <input type="radio" name="newDevice" id="inlineRadio2" value="5"> <img src="images/add.png"><br><br><strong>Add New Device</strong>
-          </label>
+        <form id="devices">
         </form>
       </div>
 
     <!-- 3. Choose the device option, Raspi/Arduino: Turn off, Lamp: turn on/off, Lock: Open/Close -->
-      <div class="col-xs-12 col-sm-12 col-md-12">
+      <div class="col-xs-12 col-sm-12 col-md-12" id="showFunctions">
         <div class="page-header">
           <h2>Functions<br><small>What should your device do?</small></h2>
         </div>
-        <form name="functionSelect">
-          <button type="button" id="submit" class="btn btn-success">ON</button>
-          <button type="button" id="submit" class="btn btn-danger">OFF</button>
-          <button type="button" id="submit" class="btn btn-danger">LOCK</button>
-          <button type="button" id="submit" class="btn btn-success">UNLOCK</button>
-          <button type="button" id="submit" class="btn btn-default">Add</button>
+        <form id="functions">
+        
         </form>
       </div>
     </div>
