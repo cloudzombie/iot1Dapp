@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="application-name" content="Lisk Guestbook"/>
+    <meta name="msapplication-TileColor" content="#F3F3E1" />
+    <meta name="msapplication-TileImage" content="images/mstile-144x144.png" />
+    <meta name="msapplication-square70x70logo" content="images/mstile-70x70.png" />
+    <meta name="msapplication-square150x150logo" content="images/mstile-150x150.png" />
+    <meta name="msapplication-wide310x150logo" content="images/mstile-310x150.png" />
+    <meta name="msapplication-square310x310logo" content="images/mstile-310x310.png" />
+
+    <link rel="apple-touch-icon-precomposed" sizes="57x57" href="images/apple-touch-icon-57x57.png" />
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="images/apple-touch-icon-114x114.png" />
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="images/apple-touch-icon-72x72.png" />
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="images/apple-touch-icon-144x144.png" />
+    <link rel="apple-touch-icon-precomposed" sizes="60x60" href="images/apple-touch-icon-60x60.png" />
+    <link rel="apple-touch-icon-precomposed" sizes="120x120" href="images/apple-touch-icon-120x120.png" />
+    <link rel="apple-touch-icon-precomposed" sizes="76x76" href="images/apple-touch-icon-76x76.png" />
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="images/apple-touch-icon-152x152.png" />
+
+    <link rel="icon" type="image/png" href="images/favicon-196x196.png" sizes="196x196" />
+    <link rel="icon" type="image/png" href="images/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/png" href="images/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="images/favicon-16x16.png" sizes="16x16" />
+    <link rel="icon" type="image/png" href="images/favicon-128.png" sizes="128x128" />
+
+    <title>Lisk IoT - Home Control</title>
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <script src="js/jquery.js"></script>
+</head>
+<body>
+  <nav class="navbar navbar-default">
+    <div class="container">
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header">
+        <a class="navbar-brand" href="/">Lisk IoT - Home Control v0.1</a>
+      </div>
+    </div><!-- /.container-fluid -->
+  </nav>
+
+
+  <div class="container">
+    <div class="row">
+
+    <!-- 1. Login -->
+      <div class="col-xs-12 col-sm-12 col-md-12">
+        <div class="page-header">
+          <h2>Login<br><small>Login to get access to your devices.</small></h2>
+        </div>
+        <form name="accountForm">
+          <div class="form-group">
+            <label for="passphrase">Passphrase</label>
+            <input type="password" class="form-control" id="passphrase" placeholder="Your Passphrase (optional)">
+          </div>
+          <button type="button" id="submitAccount" class="col-xs-12 col-sm-12 col-md-12 btn btn-default"><span id="accountAddress">Login</span>
+</button>
+        </form>
+      </div>
+
+    <!-- 2. Choose your device -->
+      <div class="col-xs-12 col-sm-12 col-md-12">
+        <div class="page-header">
+          <h2>Devices<br><small>Which home device do you want to control?</small></h2>
+        </div>
+        <form name="deviceSelect">
+          <label class="col-xs-2 radio-inline text-center">
+            <input type="radio" name="raspberryPi" id="inlineRadio1" value="1"> <img src="images/raspi.png"> <br><br><strong>Raspberry Pi</strong>
+          </label>
+          <label class="col-xs-2 radio-inline text-center">
+            <input type="radio" name="arduino" id="inlineRadio2" value="2"> <img src="images/arduino.png"><br><br><strong>Arduino</strong>
+          </label>
+          <label class="col-xs-2 radio-inline text-center">
+            <input type="radio" name="lamp" id="inlineRadio2" value="3"> <img src="images/lamp.png"><br><br><strong>Kitchen Lamp</strong>
+          </label>
+          <label class="col-xs-2 radio-inline text-center">
+            <input type="radio" name="mainDoor" id="inlineRadio2" value="4"> <img src="images/lock.png"><br><br><strong>Main Door</strong>
+          </label>
+          <label class="col-xs-2 radio-inline text-center">
+            <input type="radio" name="newDevice" id="inlineRadio2" value="5"> <img src="images/add.png"><br><br><strong>Add New Device</strong>
+          </label>
+        </form>
+      </div>
+
+    <!-- 3. Choose the device option, Raspi/Arduino: Turn off, Lamp: turn on/off, Lock: Open/Close -->
+      <div class="col-xs-12 col-sm-12 col-md-12">
+        <div class="page-header">
+          <h2>Functions<br><small>What should your device do?</small></h2>
+        </div>
+        <form name="functionSelect">
+          <button type="button" id="submit" class="btn btn-success">ON</button>
+          <button type="button" id="submit" class="btn btn-danger">OFF</button>
+          <button type="button" id="submit" class="btn btn-danger">LOCK</button>
+          <button type="button" id="submit" class="btn btn-success">UNLOCK</button>
+          <button type="button" id="submit" class="btn btn-default">Add</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <hr>
+  <div class="container" id="entryOverview"></div>
+
+  <script type="text/javascript">
+    var url = window.location.href;
+    var parts = url.split('/');
+    var dappId = parts[parts.indexOf('dapps') + 1];
+    var client ="http://45.32.158.94:7000";
+    var accountId = "";
+
+    $("#submitAccount").click(function () {
+
+      jQuery.ajax({
+        type: 'POST',
+        url: 'http://45.32.158.94:7000/api/accounts/open',
+        dataType: 'json',
+        data: { "secret": document.accountForm.passphrase.value }
+      }).done(function (data) {
+        accountId = data.account.address;
+        document.getElementById("accountAddress").innerHTML = "Logged in as: " + accountId;
+      });
+    });
+
+    // JETZT wird DAPP API Anfrage gestellt! Welche Devices installiert sind!
+
+    jQuery.get("/api/dapps/" + dappId + "/api/entries/devices?accountId=" + recipient, function (data) {
+      if (data.error == "DAPPS.DAPPS_NOT_READY") {
+        alert("Dapp offline! The master node which computes your instance of this dapp is offline. Please reload the window!");
+      }
+
+      jQuery.each(data.response.entries, function (key, value) {
+        $("#devices").prepend("<label class='col-xs-2 radio-inline text-center'><input type='radio' name='" + value.asset.device + "' id='" + value.asset.device + "' value='" + key + "'> <img src='images/" + value.asset.device + ".png'> <br><br><strong>" + value.asset.name + "</strong></label>");
+      });
+    });
+
+    // JETZT wird geschaut, welches Device ausgewählt wurde, und es werden die Funktionen angezeigt.
+
+    jQuery.get("/api/dapps/" + dappId + "/api/entries/functions?accountId=" + accountId + "?deviceId=" + device, function (data) {
+      if (data.error == "DAPPS.DAPPS_NOT_READY") {
+        alert("Dapp offline! The master node which computes your instance of this dapp is offline. Please reload the window!");
+      }
+
+      jQuery.each(data.response.entries, function (key, value) {
+        if (document.getElementById('value.asset.device').checked) {
+          $("#functions").prepend("<button type='button' id='"+ value.asset.device + "' class='btn btn-success'>"+ value.asset.device +"</button>");
+        };
+      });
+    });
+
+    //getEntries();
+    /*setInterval(function () {
+        getEntries();
+    }, 10000);*/
+  </script>
+</body>
+</html>
