@@ -101,20 +101,20 @@
 				}
 			},
             {
-              "type": "left outer",
-              "table": "asset_devices",
-              "alias": "hd",
-              "on": {
-                "t.id": "hd.transactionId"
-              }
+              	"type": "left outer",
+              	"table": "asset_devices",
+              	"alias": "hd",
+              	"on": {
+                	"t.id": "hd.transactionId"
+              	}
             },
             {
-              "type": "left outer",
-              "table": "asset_functions",
-              "alias": "hf",
-              "on": {
-                "t.id": "hf.transactionId"
-              }
+              	"type": "left outer",
+              	"table": "asset_functions",
+              	"alias": "hf",
+              	"on": {
+                	"t.id": "hf.transactionId"
+              	}
             }
 		]
 	},
@@ -318,25 +318,25 @@
         {
           "name": "accountId",
           "type": "String",
-          "length": 21,
+          "length": 42,
           "not_null": true
         },
         {
           "name": "deviceId",
           "type": "String",
-          "length": 20,
+          "length": 40,
           "not_null": true
         },
         {
           "name": "functionId",
           "type": "String",
-          "length": 20,
+          "length": 40,
           "not_null": true
         },
         {
           "name": "functionName",
           "type": "String",
-          "length": 50,
+          "length": 100,
           "not_null": true
         },
         {
