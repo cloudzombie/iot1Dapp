@@ -223,7 +223,7 @@ HomeDevice.prototype.getDevices = function (cb, query) {
             }] // The fields have to be in the same order as in the blockchain.json
         }, ['id', 'type', 'senderId', 'senderPublicKey', 'recipientId', 'amount', 'fee', 'signature', 'blockId', 'transactionId', 'accountId', 'deviceId', 'deviceName'], function (err, transactions) {
             if (err) {
-                return cb("err.toString()");
+                return cb(err.toString());
             }
 
             // Map results to asset object

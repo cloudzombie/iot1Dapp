@@ -28,6 +28,5 @@
     "contracts/myasset": "./modules/contracts/myasset.js",
     "contracts/delegates": "./modules/contracts/delegates.js",
     "contracts/withdrawaltransfer": "./modules/contracts/withdrawaltransfer.js",
-    "contracts/HomeDevice": "./modules/contracts/HomeDevice.js",
-    "contracts/HomeFunction": "./modules/contracts/HomeFunction.js"
+    "contracts/HomeDevice": "./modules/contracts/HomeDevice.js"
 }
