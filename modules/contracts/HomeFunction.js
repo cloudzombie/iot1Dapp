@@ -80,7 +80,7 @@ HomeFunction.prototype.ready = function (trs, sender, cb, scope) {
 
 HomeFunction.prototype.save = function (trs, cb) {
 	modules.api.sql.insert({
-		table: "asset_devices",
+		table: "asset_functions",
 		values: {
 			transactionId: trs.id,
 			accountId: trs.asset.accountId,
@@ -96,10 +96,10 @@ HomeFunction.prototype.dbRead = function (row) {
 		return null;
 	} else {
 		return {
-			accountId: row.hd_accountId,
-			deviceId: row.hd_deviceId,
-			functionId: row.hd_functionId,
-			functionName: row.hd_functionName
+			accountId: row.hf_accountId,
+			deviceId: row.hf_deviceId,
+			functionId: row.hf_functionId,
+			functionName: row.hf_functionName
 		};
 	}
 }
@@ -232,7 +232,7 @@ HomeFunction.prototype.getFunctions = function (cb, query) {
             },
             join: [{
                 type: 'left outer',
-                table: 'asset_devices',
+                table: 'asset_functions',
                 alias: "hf",
                 on: {"t.id": "hf.transactionId"}
             }] // The fields have to be in the same order as in the blockchain.json
@@ -242,7 +242,7 @@ HomeFunction.prototype.getFunctions = function (cb, query) {
             }
 
             // Map results to asset object
-            var devices = transactions.map(function (tx) { 
+            var functions = transactions.map(function (tx) { 
                 tx.asset = {
                 	accountId: new Buffer(tx.accountId, 'hex').toString('utf8'),
                     deviceId: new Buffer(tx.deviceId, 'hex').toString('utf8'),
@@ -258,7 +258,7 @@ HomeFunction.prototype.getFunctions = function (cb, query) {
             });
 
             return cb(null, {
-                devices: devices
+                functions: functions
             })
         });
     });
