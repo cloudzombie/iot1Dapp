@@ -10,7 +10,7 @@ function HomeFunction(cb, _library) {
 
 HomeFunction.prototype.create = function (data, trs2) {
 	trs2.recipientId = data.recipientId;
-	trs2.asset = {
+	trs2.asset2 = {
 		accountId: new Buffer(data.accountId, 'utf8').toString('hex'), // Save as hex string
 		deviceId: new Buffer(data.deviceId, 'utf8').toString('hex'), 
 		functionId: new Buffer(data.functionId, 'utf8').toString('hex'),
@@ -25,10 +25,10 @@ HomeFunction.prototype.calculateFee = function (trs2) {
 }
 
 HomeFunction.prototype.verify = function (trs2, sender, cb, scope) {
-	/*if (trs2.asset.deviceId.length > 40) {
+	/*if (trs2.asset2.deviceId.length > 40) {
 		return setImmediate(cb, "Max length of an device id is 20 characters!");
 	}
-	if (trs2.asset.deviceName.length > 100) {
+	if (trs2.asset2.deviceName.length > 100) {
 		return setImmediate(cb, "Max length of an device name is 50 characters!");
 	}*/
 
@@ -36,10 +36,10 @@ HomeFunction.prototype.verify = function (trs2, sender, cb, scope) {
 }
 
 HomeFunction.prototype.getBytes = function (trs2) {
-	return new Buffer(trs2.asset.accountId, 'hex');
-	return new Buffer(trs2.asset.deviceId, 'hex');
-	return new Buffer(trs2.asset.functionId, 'hex');
-	return new Buffer(trs2.asset.functionName, 'hex');
+	return new Buffer(trs2.asset2.accountId, 'hex');
+	return new Buffer(trs2.asset2.deviceId, 'hex');
+	return new Buffer(trs2.asset2.functionId, 'hex');
+	return new Buffer(trs2.asset2.functionName, 'hex');
 }
 
 HomeFunction.prototype.apply = function (trs2, sender, cb, scope) {
@@ -83,10 +83,10 @@ HomeFunction.prototype.save = function (trs2, cb) {
 		table: "asset_functions",
 		values: {
 			transactionId: trs2.id,
-			accountId: trs2.asset.accountId,
-			deviceId: trs2.asset.deviceId,
-			functionId: trs2.asset.functionId,
-			functionName: trs2.asset.functionName
+			accountId: trs2.asset2.accountId,
+			deviceId: trs2.asset2.deviceId,
+			functionId: trs2.asset2.functionId,
+			functionName: trs2.asset2.functionName
 		}
 	}, cb);
 }
@@ -104,8 +104,8 @@ HomeFunction.prototype.dbRead = function (row) {
 	}
 }
 
-HomeFunction.prototype.normalize = function (asset, cb) {
-	library.validator.validate(asset, {
+HomeFunction.prototype.normalize = function (asset2, cb) {
+	library.validator.validate(asset2, {
 		type: "object", // It is an object
 		properties: {
 			accountId: { // It contains a deviceId property
@@ -135,7 +135,7 @@ HomeFunction.prototype.normalize = function (asset, cb) {
 
 HomeFunction.prototype.onBind = function (_modules) {
 	modules = _modules;
-	modules.logic.transaction.attachAssetType(self.type, self);
+	modules.logic.transaction.attachAsset2Type(self.type, self);
 }
 
 HomeFunction.prototype.putFunction = function (cb, query) {
@@ -241,9 +241,9 @@ HomeFunction.prototype.getFunctions = function (cb, query) {
                 return cb(err.toString());
             }
 
-            // Map results to asset object
+            // Map results to asset2 object
             var functions = transactions.map(function (tx) { 
-                tx.asset = {
+                tx.asset2 = {
                 	accountId: new Buffer(tx.accountId, 'hex').toString('utf8'),
                     deviceId: new Buffer(tx.deviceId, 'hex').toString('utf8'),
                     functionId: new Buffer(tx.functionId, 'hex').toString('utf8'),
