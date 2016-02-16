@@ -1,8 +1,8 @@
 {
-	"name": "guestbookDapp",
+	"name": "iot1Dapp",
 	"version": "1.0.0",
-	"description": "Lisk guestbook dapp",
-	"repository": "git@github.com:MaxKK/guestbookDapp.git",
+	"description": "Lisk Home Control",
+	"repository": "git@github.com:MaxKK/iot1Dapp.git",
 	"main": "index.js",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1"

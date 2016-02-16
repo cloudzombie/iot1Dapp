@@ -89,7 +89,7 @@ HomeDevice.prototype.save = function (trs, cb) {
 }
 
 HomeDevice.prototype.dbRead = function (row) {
-	if (!row.gb_transactionId) {
+	if (!row.hd_transactionId) {
 		return null;
 	} else {
 		return {

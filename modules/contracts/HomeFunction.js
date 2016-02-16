@@ -92,7 +92,7 @@ HomeFunction.prototype.save = function (trs, cb) {
 }
 
 HomeFunction.prototype.dbRead = function (row) {
-	if (!row.gb_transactionId) {
+	if (!row.hf_transactionId) {
 		return null;
 	} else {
 		return {

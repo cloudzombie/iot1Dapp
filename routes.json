@@ -70,14 +70,14 @@
 		  "handler": "contracts.HomeDevice.putDevice"
 	},
 	{
-		  "path": "/put/function",
-		  "method": "put",
-		  "handler": "contracts.HomeFunction.putFunction"
-	},
-	{
 		   "path": "/get/devices",
 		   "method": "get",
 		   "handler" : "contracts.HomeDevice.getDevices"
+	},
+	{
+		  "path": "/put/function",
+		  "method": "put",
+		  "handler": "contracts.HomeFunction.putFunction"
 	},
 	{
 		   "path": "/get/functions",
