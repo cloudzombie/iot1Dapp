@@ -1,110 +1,106 @@
 var private = {}, self = null,
 	library = null, modules = null;
 
-function HomeFunction(cb, _library) {
+function HomeDevice(cb, _library) {
 	self = this;
 	self.type = 6;
 	library = _library;
 	cb(null, self);
 }
 
-HomeFunction.prototype.create = function (data, trs2) {
-	trs2.recipientId = data.recipientId;
-	trs2.asset = {
+HomeDevice.prototype.create = function (data, trs) {
+	trs.recipientId = data.recipientId;
+	trs.asset = {
 		accountId: new Buffer(data.accountId, 'utf8').toString('hex'), // Save as hex string
 		deviceId: new Buffer(data.deviceId, 'utf8').toString('hex'), 
-		functionId: new Buffer(data.functionId, 'utf8').toString('hex'),
-		functionName: new Buffer(data.functionName, 'utf8').toString('hex')
+		deviceName: new Buffer(data.deviceName, 'utf8').toString('hex')
 	};
 
-	return trs2;
+	return trs;
 }
 
-HomeFunction.prototype.calculateFee = function (trs2) {
+HomeDevice.prototype.calculateFee = function (trs) {
     return 0; // Free!
 }
 
-HomeFunction.prototype.verify = function (trs2, sender, cb, scope) {
-	/*if (trs2.asset.deviceId.length > 40) {
+HomeDevice.prototype.verify = function (trs, sender, cb, scope) {
+	/*if (trs.asset.deviceId.length > 40) {
 		return setImmediate(cb, "Max length of an device id is 20 characters!");
 	}
-	if (trs2.asset.deviceName.length > 100) {
+	if (trs.asset.deviceName.length > 100) {
 		return setImmediate(cb, "Max length of an device name is 50 characters!");
 	}*/
 
-	setImmediate(cb, null, trs2);
+	setImmediate(cb, null, trs);
 }
 
-HomeFunction.prototype.getBytes = function (trs2) {
-	return new Buffer(trs2.asset.accountId, 'hex');
-	return new Buffer(trs2.asset.deviceId, 'hex');
-	return new Buffer(trs2.asset.functionId, 'hex');
-	return new Buffer(trs2.asset.functionName, 'hex');
+HomeDevice.prototype.getBytes = function (trs) {
+	return new Buffer(trs.asset.accountId, 'hex');
+	return new Buffer(trs.asset.deviceId, 'hex');
+	return new Buffer(trs.asset.deviceName, 'hex');
 }
 
-HomeFunction.prototype.apply = function (trs2, sender, cb, scope) {
+HomeDevice.prototype.apply = function (trs, sender, cb, scope) {
     modules.blockchain.accounts.mergeAccountAndGet({
         address: sender.address,
-        balance: -trs2.fee
+        balance: -trs.fee
     }, cb);
 }
 
-HomeFunction.prototype.undo = function (trs2, sender, cb, scope) {
+HomeDevice.prototype.undo = function (trs, sender, cb, scope) {
     modules.blockchain.accounts.undoMerging({
         address: sender.address,
-        balance: -trs2.fee
+        balance: -trs.fee
     }, cb);
 }
 
-HomeFunction.prototype.applyUnconfirmed = function (trs2, sender, cb, scope) {
-    if (sender.u_balance < trs2.fee) {
+HomeDevice.prototype.applyUnconfirmed = function (trs, sender, cb, scope) {
+    if (sender.u_balance < trs.fee) {
         return setImmediate(cb, "Sender doesn't have enough coins");
     }
 
     modules.blockchain.accounts.mergeAccountAndGet({
         address: sender.address,
-        u_balance: -trs2.fee
+        u_balance: -trs.fee
     }, cb);
 }
 
-HomeFunction.prototype.undoUnconfirmed = function (trs2, sender, cb, scope) {
+HomeDevice.prototype.undoUnconfirmed = function (trs, sender, cb, scope) {
     modules.blockchain.accounts.undoMerging({
         address: sender.address,
-        u_balance: -trs2.fee
+        u_balance: -trs.fee
     }, cb);
 }
 
-HomeFunction.prototype.ready = function (trs2, sender, cb, scope) {
+HomeDevice.prototype.ready = function (trs, sender, cb, scope) {
 	setImmediate(cb);
 }
 
-HomeFunction.prototype.save = function (trs2, cb) {
+HomeDevice.prototype.save = function (trs, cb) {
 	modules.api.sql.insert({
-		table: "asset_functions",
+		table: "asset_devices",
 		values: {
-			transactionId: trs2.id,
-			accountId: trs2.asset.accountId,
-			deviceId: trs2.asset.deviceId,
-			functionId: trs2.asset.functionId,
-			functionName: trs2.asset.functionName
+			transactionId: trs.id,
+			accountId: trs.asset.accountId,
+			deviceId: trs.asset.deviceId,
+			deviceName: trs.asset.deviceName
 		}
 	}, cb);
 }
 
-HomeFunction.prototype.dbRead = function (row) {
-	if (!row.hf_transactionId) {
+HomeDevice.prototype.dbRead = function (row) {
+	if (!row.hd_transactionId) {
 		return null;
 	} else {
 		return {
-			accountId: row.hf_accountId,
-			deviceId: row.hf_deviceId,
-			functionId: row.hf_functionId,
-			functionName: row.hf_functionName
+			accountId: row.hd_accountId,
+			deviceId: row.hd_deviceId,
+			deviceName: row.hd_deviceName
 		};
 	}
 }
 
-HomeFunction.prototype.normalize = function (asset, cb) {
+HomeDevice.prototype.normalize = function (asset, cb) {
 	library.validator.validate(asset, {
 		type: "object", // It is an object
 		properties: {
@@ -118,27 +114,22 @@ HomeFunction.prototype.normalize = function (asset, cb) {
 				format: "hex", // It is in a hexadecimal format
 				minLength: 1 // Minimum length of string is 1 character
 			},
-			functionId: { // It contains a functionId property
-				type: "string", // It is a string
-				format: "hex", // It is in a hexadecimal format
-				minLength: 1 // Minimum length of string is 1 character
-			},
-			functionName: { // It contains a functionName property
+			deviceName: { // It contains a deviceName property
 				type: "string", // It is a string
 				format: "hex", // It is in a hexadecimal format
 				minLength: 1 // Minimum length of string is 1 character
 			}
 		},
-		required: ["accountId", "deviceId", "functionId", "functionName"]
+		required: ["accountId", "deviceId", "deviceName"]
 	}, cb);
 }
 
-HomeFunction.prototype.onBind = function (_modules) {
+HomeDevice.prototype.onBind = function (_modules) {
 	modules = _modules;
 	modules.logic.transaction.attachAssetType(self.type, self);
 }
 
-HomeFunction.prototype.putFunction = function (cb, query) {
+HomeDevice.prototype.putDevice = function (cb, query) {
 	library.validator.validate(query, {
 		type: "object",
 		properties: {
@@ -157,12 +148,7 @@ HomeFunction.prototype.putFunction = function (cb, query) {
 				minLength: 1,
 				maxLength: 20
 			},
-			functionId: {
-				type: "string",
-				minLength: 1,
-				maxLength: 20
-			},
-			functionName: {
+			deviceName: {
 				type: "string",
 				minLength: 1,
 				maxLength: 50
@@ -190,8 +176,7 @@ HomeFunction.prototype.putFunction = function (cb, query) {
 					type: self.type,
 					accountId: query.accountId,
 					deviceId: query.deviceId,
-					functionId: query.functionId,
-					functionName: query.functionName,
+					deviceName: query.deviceName,
 					sender: account,
 					keypair: keypair
 				});
@@ -206,7 +191,7 @@ HomeFunction.prototype.putFunction = function (cb, query) {
 	});
 }
 
-HomeFunction.prototype.getFunctions = function (cb, query) {
+HomeDevice.prototype.getDevices = function (cb, query) {
     // Verify query parameters
     library.validator.validate(query, {
         type: "object",
@@ -232,36 +217,34 @@ HomeFunction.prototype.getFunctions = function (cb, query) {
             },
             join: [{
                 type: 'left outer',
-                table: 'asset_functions',
-                alias: "hf",
-                on: {"t.id": "hf.transactionId"}
+                table: 'asset_devices',
+                alias: "hd",
+                on: {"t.id": "hd.transactionId"}
             }] // The fields have to be in the same order as in the blockchain.json
-        }, ['id', 'type', 'senderId', 'senderPublicKey', 'recipientId', 'amount', 'fee', 'signature', 'blockId', 'transactionId', 'accountId', 'deviceId', 'functionId', 'functionName'], function (err, transactions) {
+        }, ['id', 'type', 'senderId', 'senderPublicKey', 'recipientId', 'amount', 'fee', 'signature', 'blockId', 'transactionId', 'accountId', 'deviceId', 'deviceName'], function (err, transactions) {
             if (err) {
                 return cb(err.toString());
             }
 
             // Map results to asset object
-            var functions = transactions.map(function (tx) { 
+            var devices = transactions.map(function (tx) { 
                 tx.asset = {
                 	accountId: new Buffer(tx.accountId, 'hex').toString('utf8'),
                     deviceId: new Buffer(tx.deviceId, 'hex').toString('utf8'),
-                    functionId: new Buffer(tx.functionId, 'hex').toString('utf8'),
-                    functionName: new Buffer(tx.functionName, 'hex').toString('utf8')
+                    deviceName: new Buffer(tx.deviceName, 'hex').toString('utf8')
                 };
 
                 delete tx.accountId;
                 delete tx.deviceId;
-                delete tx.functionId;
-                delete tx.functionName;
+                delete tx.deviceName;
                 return tx;
             });
 
             return cb(null, {
-                functions: functions
+                devices: devices
             })
         });
     });
 }
 
-module.exports = HomeFunction;
+module.exports = HomeDevice;
