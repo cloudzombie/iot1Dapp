@@ -204,7 +204,7 @@ HomeDevice.prototype.getDevices = function (cb, query) {
         required: ["accountId"]
     }, function (err) {
         if (err) {
-            return cb(err[0].message);
+            return cb("err[0].message");
         }
 
         // Select from transactions table and join entries from the asset_entries table
