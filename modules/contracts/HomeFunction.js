@@ -11,10 +11,10 @@ function HomeFunction(cb, _library) {
 HomeFunction.prototype.create = function (data, trs) {
 	trs.recipientId = data.recipientId;
 	trs.asset = {
-		accountId2: new Buffer(data.accountId2, 'utf8').toString('hex'), // Save as hex string
-		deviceId2: new Buffer(data.deviceId2, 'utf8').toString('hex'), 
-		functionId2: new Buffer(data.functionId2, 'utf8').toString('hex'),
-		functionName2: new Buffer(data.functionName2, 'utf8').toString('hex')
+		accountId: new Buffer(data.accountId, 'utf8').toString('hex'), // Save as hex string
+		deviceId: new Buffer(data.deviceId, 'utf8').toString('hex'), 
+		functionId: new Buffer(data.functionId, 'utf8').toString('hex'),
+		functionName: new Buffer(data.functionName, 'utf8').toString('hex')
 	};
 
 	return trs;
@@ -25,7 +25,7 @@ HomeFunction.prototype.calculateFee = function (trs) {
 }
 
 HomeFunction.prototype.verify = function (trs, sender, cb, scope) {
-	/*if (trs.asset.deviceId2.length > 40) {
+	/*if (trs.asset.deviceId.length > 40) {
 		return setImmediate(cb, "Max length of an device id is 20 characters!");
 	}
 	if (trs.asset.deviceName.length > 100) {
@@ -36,10 +36,10 @@ HomeFunction.prototype.verify = function (trs, sender, cb, scope) {
 }
 
 HomeFunction.prototype.getBytes = function (trs) {
-	return new Buffer(trs.asset.accountId2, 'hex');
-	return new Buffer(trs.asset.deviceId2, 'hex');
-	return new Buffer(trs.asset.functionId2, 'hex');
-	return new Buffer(trs.asset.functionName2, 'hex');
+	return new Buffer(trs.asset.accountId, 'hex');
+	return new Buffer(trs.asset.deviceId, 'hex');
+	return new Buffer(trs.asset.functionId, 'hex');
+	return new Buffer(trs.asset.functionName, 'hex');
 }
 
 HomeFunction.prototype.apply = function (trs, sender, cb, scope) {
@@ -83,10 +83,10 @@ HomeFunction.prototype.save = function (trs, cb) {
 		table: "asset_functions",
 		values: {
 			transactionId: trs.id,
-			accountId2: trs.asset.accountId2,
-			deviceId2: trs.asset.deviceId2,
-			functionId2: trs.asset.functionId2,
-			functionName2: trs.asset.functionName2
+			accountId: trs.asset.accountId,
+			deviceId: trs.asset.deviceId,
+			functionId: trs.asset.functionId,
+			functionName: trs.asset.functionName
 		}
 	}, cb);
 }
@@ -96,10 +96,10 @@ HomeFunction.prototype.dbRead = function (row) {
 		return null;
 	} else {
 		return {
-			accountId2: row.hf_accountId2,
-			deviceId2: row.hf_deviceId2,
-			functionId2: row.hf_functionId2,
-			functionName2: row.hf_functionName2
+			accountId: row.hf_accountId,
+			deviceId: row.hf_deviceId,
+			functionId: row.hf_functionId,
+			functionName: row.hf_functionName
 		};
 	}
 }
@@ -108,28 +108,28 @@ HomeFunction.prototype.normalize = function (asset, cb) {
 	library.validator.validate(asset, {
 		type: "object", // It is an object
 		properties: {
-			accountId2: { // It contains a deviceId2 property
+			accountId: { // It contains a deviceId property
 				type: "string", // It is a string
 				format: "hex", // It is in a hexadecimal format
 				minLength: 1 // Minimum length of string is 1 character
 			},
-			deviceId2: { // It contains a deviceId2 property
+			deviceId: { // It contains a deviceId property
 				type: "string", // It is a string
 				format: "hex", // It is in a hexadecimal format
 				minLength: 1 // Minimum length of string is 1 character
 			},
-			functionId2: { // It contains a functionId2 property
+			functionId: { // It contains a functionId property
 				type: "string", // It is a string
 				format: "hex", // It is in a hexadecimal format
 				minLength: 1 // Minimum length of string is 1 character
 			},
-			functionName2: { // It contains a functionName2 property
+			functionName: { // It contains a functionName property
 				type: "string", // It is a string
 				format: "hex", // It is in a hexadecimal format
 				minLength: 1 // Minimum length of string is 1 character
 			}
 		},
-		required: ["accountId2", "deviceId2", "functionId2", "functionName2"]
+		required: ["accountId", "deviceId", "functionId", "functionName"]
 	}, cb);
 }
 
@@ -142,7 +142,7 @@ HomeFunction.prototype.putFunction = function (cb, query) {
 	library.validator.validate(query, {
 		type: "object",
 		properties: {
-			accountId2: {
+			accountId: {
 				type: "string",
 				minLength: 1,
 				maxLength: 21
@@ -152,17 +152,17 @@ HomeFunction.prototype.putFunction = function (cb, query) {
 				minLength: 1,
 				maxLength: 100
 			},
-			deviceId2: {
+			deviceId: {
 				type: "string",
 				minLength: 1,
 				maxLength: 20
 			},
-			functionId2: {
+			functionId: {
 				type: "string",
 				minLength: 1,
 				maxLength: 20
 			},
-			functionName2: {
+			functionName: {
 				type: "string",
 				minLength: 1,
 				maxLength: 50
@@ -188,10 +188,10 @@ HomeFunction.prototype.putFunction = function (cb, query) {
 			try {
 				var transaction = library.modules.logic.transaction.create({
 					type: self.type,
-					accountId2: query.accountId2,
-					deviceId2: query.deviceId2,
-					functionId2: query.functionId2,
-					functionName2: query.functionName2,
+					accountId: query.accountId,
+					deviceId: query.deviceId,
+					functionId: query.functionId,
+					functionName: query.functionName,
 					sender: account,
 					keypair: keypair
 				});
@@ -211,12 +211,12 @@ HomeFunction.prototype.getFunctions = function (cb, query) {
     library.validator.validate(query, {
         type: "object",
         properties: {
-            accountId2: {
+            accountId: {
                 type: "string",
                 minLength: 1
             }
         },
-        required: ["accountId2"]
+        required: ["accountId"]
     }, function (err) {
         if (err) {
             return cb(err[0].message);
@@ -227,7 +227,7 @@ HomeFunction.prototype.getFunctions = function (cb, query) {
             table: "transactions",
             alias: "t",
             condition: {
-                accountId2: query.accountId2,
+                accountId: query.accountId,
                 type: self.type
             },
             join: [{
@@ -236,7 +236,7 @@ HomeFunction.prototype.getFunctions = function (cb, query) {
                 alias: "hf",
                 on: {"t.id": "hf.transactionId"}
             }] // The fields have to be in the same order as in the blockchain.json
-        }, ['id', 'type', 'senderId', 'senderPublicKey', 'recipientId', 'amount', 'fee', 'signature', 'blockId', 'transactionId', 'accountId2', 'deviceId2', 'functionId2', 'functionName2'], function (err, transactions) {
+        }, ['id', 'type', 'senderId', 'senderPublicKey', 'recipientId', 'amount', 'fee', 'signature', 'blockId', 'transactionId', 'accountId', 'deviceId', 'functionId', 'functionName'], function (err, transactions) {
             if (err) {
                 return cb(err.toString());
             }
@@ -244,16 +244,16 @@ HomeFunction.prototype.getFunctions = function (cb, query) {
             // Map results to asset object
             var functions = transactions.map(function (tx) { 
                 tx.asset = {
-                	accountId2: new Buffer(tx.accountId2, 'hex').toString('utf8'),
-                    deviceId2: new Buffer(tx.deviceId2, 'hex').toString('utf8'),
-                    functionId2: new Buffer(tx.functionId2, 'hex').toString('utf8'),
-                    functionName2: new Buffer(tx.functionName2, 'hex').toString('utf8')
+                	accountId: new Buffer(tx.accountId, 'hex').toString('utf8'),
+                    deviceId: new Buffer(tx.deviceId, 'hex').toString('utf8'),
+                    functionId: new Buffer(tx.functionId, 'hex').toString('utf8'),
+                    functionName: new Buffer(tx.functionName, 'hex').toString('utf8')
                 };
 
-                delete tx.accountId2;
-                delete tx.deviceId2;
-                delete tx.functionId2;
-                delete tx.functionName2;
+                delete tx.accountId;
+                delete tx.deviceId;
+                delete tx.functionId;
+                delete tx.functionName;
                 return tx;
             });
 

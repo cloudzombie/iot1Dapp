@@ -316,25 +316,25 @@
       "type": "table",
       "tableFields": [
         {
-          "name": "accountId2",
+          "name": "accountId",
           "type": "String",
           "length": 42,
           "not_null": true
         },
         {
-          "name": "deviceId2",
+          "name": "deviceId",
           "type": "String",
           "length": 40,
           "not_null": true
         },
         {
-          "name": "functionId2",
+          "name": "functionId",
           "type": "String",
           "length": 40,
           "not_null": true
         },
         {
-          "name": "functionName2",
+          "name": "functionName",
           "type": "String",
           "length": 100,
           "not_null": true
