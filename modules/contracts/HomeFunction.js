@@ -3,7 +3,7 @@ var private = {}, self = null,
 
 function HomeFunction(cb, _library) {
 	self = this;
-	self.type = 6;
+	self.type = 6
 	library = _library;
 	cb(null, self);
 }

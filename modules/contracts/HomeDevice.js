@@ -3,14 +3,14 @@ var private = {}, self = null,
 
 function HomeDevice(cb, _library) {
 	self = this;
-	self.type = 6;
+	self.type = 6
 	library = _library;
 	cb(null, self);
 }
 
 HomeDevice.prototype.create = function (data, trs) {
 	trs.recipientId = data.recipientId;
-	trs.asset2 = {
+	trs.asset = {
 		accountId: new Buffer(data.accountId, 'utf8').toString('hex'), // Save as hex string
 		deviceId: new Buffer(data.deviceId, 'utf8').toString('hex'), 
 		deviceName: new Buffer(data.deviceName, 'utf8').toString('hex')
@@ -24,10 +24,10 @@ HomeDevice.prototype.calculateFee = function (trs) {
 }
 
 HomeDevice.prototype.verify = function (trs, sender, cb, scope) {
-	/*if (trs.asset2.deviceId.length > 40) {
+	/*if (trs.asset.deviceId.length > 40) {
 		return setImmediate(cb, "Max length of an device id is 20 characters!");
 	}
-	if (trs.asset2.deviceName.length > 100) {
+	if (trs.asset.deviceName.length > 100) {
 		return setImmediate(cb, "Max length of an device name is 50 characters!");
 	}*/
 
@@ -35,9 +35,9 @@ HomeDevice.prototype.verify = function (trs, sender, cb, scope) {
 }
 
 HomeDevice.prototype.getBytes = function (trs) {
-	return new Buffer(trs.asset2.accountId, 'hex');
-	return new Buffer(trs.asset2.deviceId, 'hex');
-	return new Buffer(trs.asset2.deviceName, 'hex');
+	return new Buffer(trs.asset.accountId, 'hex');
+	return new Buffer(trs.asset.deviceId, 'hex');
+	return new Buffer(trs.asset.deviceName, 'hex');
 }
 
 HomeDevice.prototype.apply = function (trs, sender, cb, scope) {
@@ -78,12 +78,12 @@ HomeDevice.prototype.ready = function (trs, sender, cb, scope) {
 
 HomeDevice.prototype.save = function (trs, cb) {
 	modules.api.sql.insert({
-		table: "asset2_devices",
+		table: "asset_devices",
 		values: {
 			transactionId: trs.id,
-			accountId: trs.asset2.accountId,
-			deviceId: trs.asset2.deviceId,
-			deviceName: trs.asset2.deviceName
+			accountId: trs.asset.accountId,
+			deviceId: trs.asset.deviceId,
+			deviceName: trs.asset.deviceName
 		}
 	}, cb);
 }
@@ -100,8 +100,8 @@ HomeDevice.prototype.dbRead = function (row) {
 	}
 }
 
-HomeDevice.prototype.normalize = function (asset2, cb) {
-	library.validator.validate(asset2, {
+HomeDevice.prototype.normalize = function (asset, cb) {
+	library.validator.validate(asset, {
 		type: "object", // It is an object
 		properties: {
 			accountId: { // It contains a deviceId property
@@ -126,7 +126,7 @@ HomeDevice.prototype.normalize = function (asset2, cb) {
 
 HomeDevice.prototype.onBind = function (_modules) {
 	modules = _modules;
-	modules.logic.transaction.attachAsset2Type(self.type, self);
+	modules.logic.transaction.attachAssetType(self.type, self);
 }
 
 HomeDevice.prototype.putDevice = function (cb, query) {
@@ -207,7 +207,7 @@ HomeDevice.prototype.getDevices = function (cb, query) {
             return cb(err[0].message);
         }
 
-        // Select from transactions table and join entries from the asset2_entries table
+        // Select from transactions table and join entries from the asset_entries table
         modules.api.sql.select({
             table: "transactions",
             alias: "t",
@@ -217,7 +217,7 @@ HomeDevice.prototype.getDevices = function (cb, query) {
             },
             join: [{
                 type: 'left outer',
-                table: 'asset2_devices',
+                table: 'asset_devices',
                 alias: "hd",
                 on: {"t.id": "hd.transactionId"}
             }] // The fields have to be in the same order as in the blockchain.json
@@ -226,9 +226,9 @@ HomeDevice.prototype.getDevices = function (cb, query) {
                 return cb(err.toString());
             }
 
-            // Map results to asset2 object
+            // Map results to asset object
             var devices = transactions.map(function (tx) { 
-                tx.asset2 = {
+                tx.asset = {
                 	accountId: new Buffer(tx.accountId, 'hex').toString('utf8'),
                     deviceId: new Buffer(tx.deviceId, 'hex').toString('utf8'),
                     deviceName: new Buffer(tx.deviceName, 'hex').toString('utf8')
