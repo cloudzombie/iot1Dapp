@@ -204,7 +204,7 @@ HomeDevice.prototype.getDevices = function (cb, query) {
         required: ["accountId"]
     }, function (err) {
         if (err) {
-            return cb("err[0].message");
+            return cb(err[0].message);
         }
 
         // Select from transactions table and join entries from the asset_entries table
@@ -223,7 +223,7 @@ HomeDevice.prototype.getDevices = function (cb, query) {
             }] // The fields have to be in the same order as in the blockchain.json
         }, ['id', 'type', 'senderId', 'senderPublicKey', 'recipientId', 'amount', 'fee', 'signature', 'blockId', 'transactionId', 'accountId', 'deviceId', 'deviceName'], function (err, transactions) {
             if (err) {
-                return cb(err.toString());
+                return cb("err.toString()");
             }
 
             // Map results to asset object
