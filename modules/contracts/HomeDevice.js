@@ -9,6 +9,12 @@ function HomeDevice(cb, _library) {
 }
 
 HomeDevice.prototype.create = function (data, trs) {
+	trs.asset = {
+		devices: {
+			data: data.data
+		}
+	};
+
 	trs.recipientId = data.recipientId;
 	trs.asset.devices = {
 		accountId: new Buffer(data.accountId, 'utf8').toString('hex'), // Save as hex string
@@ -93,9 +99,11 @@ HomeDevice.prototype.dbRead = function (row) {
 		return null;
 	} else {
 		return {
-			accountId: row.hd_accountId,
-			deviceId: row.hd_deviceId,
-			deviceName: row.hd_deviceName
+			devices: {
+				accountId: row.hd_accountId,
+				deviceId: row.hd_deviceId,
+				deviceName: row.hd_deviceName
+			}
 		};
 	}
 }

@@ -9,6 +9,12 @@ function HomeFunction(cb, _library) {
 }
 
 HomeFunction.prototype.create = function (data, trs) {
+	trs.asset = {
+		functions: {
+			data: data.data
+		}
+	};
+
 	trs.recipientId = data.recipientId;
 	trs.asset.functions = {
 		accountId: new Buffer(data.accountId, 'utf8').toString('hex'), // Save as hex string
@@ -95,10 +101,12 @@ HomeFunction.prototype.dbRead = function (row) {
 		return null;
 	} else {
 		return {
-			accountId: row.hf_accountId,
-			deviceId: row.hf_deviceId,
-			functionId: row.hf_functionId,
-			functionName: row.hf_functionName
+			functions: {
+				accountId: row.hf_accountId,
+				deviceId: row.hf_deviceId,
+				functionId: row.hf_functionId,
+				functionName: row.hf_functionName				
+			}
 		};
 	}
 }
