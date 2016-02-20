@@ -10,12 +10,6 @@ function HomeFunction(cb, _library) {
 
 HomeFunction.prototype.create = function (data, trs) {
 	trs.asset = {
-		functions: {
-			data: data.data
-		}
-	};
-
-	trs.asset.functions = {
 		accountId: new Buffer(data.accountId, 'utf8').toString('hex'), // Save as hex string
 		deviceId: new Buffer(data.deviceId, 'utf8').toString('hex'), 
 		functionId: new Buffer(data.functionId, 'utf8').toString('hex'),
@@ -30,10 +24,10 @@ HomeFunction.prototype.calculateFee = function (trs) {
 }
 
 HomeFunction.prototype.verify = function (trs, sender, cb, scope) {
-	/*if (trs.asset.functions.deviceId.length > 40) {
+	/*if (trs.asset.deviceId.length > 40) {
 		return setImmediate(cb, "Max length of an device id is 20 characters!");
 	}
-	if (trs.asset.functions.deviceName.length > 100) {
+	if (trs.asset.deviceName.length > 100) {
 		return setImmediate(cb, "Max length of an device name is 50 characters!");
 	}*/
 
@@ -41,7 +35,7 @@ HomeFunction.prototype.verify = function (trs, sender, cb, scope) {
 }
 
 HomeFunction.prototype.getBytes = function (trs) {
-	var b = Buffer.concat([new Buffer(trs.asset.functions.accountId, 'hex'), new Buffer(trs.asset.functions.deviceId, 'hex'), new Buffer(trs.asset.functions.functionId, 'hex'), new Buffer(trs.asset.functions.functionName, 'hex')]);
+	var b = Buffer.concat([new Buffer(trs.asset.accountId, 'hex'), new Buffer(trs.asset.deviceId, 'hex'), new Buffer(trs.asset.functionId, 'hex'), new Buffer(trs.asset.functionName, 'hex')]);
 
 	return b;
 }
@@ -87,10 +81,10 @@ HomeFunction.prototype.save = function (trs, cb) {
 		table: "asset_functions",
 		values: {
 			transactionId: trs.id,
-			accountId: trs.asset.functions.accountId,
-			deviceId: trs.asset.functions.deviceId,
-			functionId: trs.asset.functions.functionId,
-			functionName: trs.asset.functions.functionName
+			accountId: trs.asset.accountId,
+			deviceId: trs.asset.deviceId,
+			functionId: trs.asset.functionId,
+			functionName: trs.asset.functionName
 		}
 	}, cb);
 }
@@ -100,12 +94,10 @@ HomeFunction.prototype.dbRead = function (row) {
 		return null;
 	} else {
 		return {
-			functions: {
 				accountId: row.hf_accountId,
 				deviceId: row.hf_deviceId,
 				functionId: row.hf_functionId,
-				functionName: row.hf_functionName				
-			}
+				functionName: row.hf_functionName
 		};
 	}
 }
@@ -248,8 +240,8 @@ HomeFunction.prototype.getFunctions = function (cb, query) {
             }
 
             // Map results to asset object
-            var functions = transactions.map(function (tx) { 
-                tx.asset.functions = {
+            var HomeFunctions = transactions.map(function (tx) { 
+                tx.asset = {
                 	accountId: new Buffer(tx.accountId, 'hex').toString('utf8'),
                     deviceId: new Buffer(tx.deviceId, 'hex').toString('utf8'),
                     functionId: new Buffer(tx.functionId, 'hex').toString('utf8'),
@@ -264,7 +256,7 @@ HomeFunction.prototype.getFunctions = function (cb, query) {
             });
 
             return cb(null, {
-                functions: functions
+                HomeFunctions: HomeFunctions
             })
         });
     });
