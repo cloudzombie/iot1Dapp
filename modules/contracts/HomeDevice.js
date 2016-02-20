@@ -234,7 +234,7 @@ HomeDevice.prototype.getDevices = function (cb, query) {
             }
 
             // Map results to asset object
-            var devices = transactions.map(function (tx) { 
+            var HomeDevices = transactions.map(function (tx) { 
                 tx.asset.devices = {
                 	accountId: new Buffer(tx.accountId, 'hex').toString('utf8'),
                     deviceId: new Buffer(tx.deviceId, 'hex').toString('utf8'),
@@ -248,7 +248,7 @@ HomeDevice.prototype.getDevices = function (cb, query) {
             });
 
             return cb(null, {
-                devices: devices
+                HomeDevices: HomeDevices
             })
         });
     });
