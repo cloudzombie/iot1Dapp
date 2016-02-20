@@ -15,7 +15,6 @@ HomeFunction.prototype.create = function (data, trs) {
 		}
 	};
 
-	trs.recipientId = data.recipientId;
 	trs.asset.functions = {
 		accountId: new Buffer(data.accountId, 'utf8').toString('hex'), // Save as hex string
 		deviceId: new Buffer(data.deviceId, 'utf8').toString('hex'), 
