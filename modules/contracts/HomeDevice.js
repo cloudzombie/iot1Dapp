@@ -10,7 +10,7 @@ function HomeDevice(cb, _library) {
 
 HomeDevice.prototype.create = function (data, trs) {
 	trs.recipientId = data.recipientId;
-	trs.assetDevice = {
+	trs.asset.devices = {
 		accountId: new Buffer(data.accountId, 'utf8').toString('hex'), // Save as hex string
 		deviceId: new Buffer(data.deviceId, 'utf8').toString('hex'), 
 		deviceName: new Buffer(data.deviceName, 'utf8').toString('hex')
@@ -24,10 +24,10 @@ HomeDevice.prototype.calculateFee = function (trs) {
 }
 
 HomeDevice.prototype.verify = function (trs, sender, cb, scope) {
-	/*if (trs.assetDevice.deviceId.length > 40) {
+	/*if (trs.asset.devices.deviceId.length > 40) {
 		return setImmediate(cb, "Max length of an device id is 20 characters!");
 	}
-	if (trs.assetDevice.deviceName.length > 100) {
+	if (trs.asset.devices.deviceName.length > 100) {
 		return setImmediate(cb, "Max length of an device name is 50 characters!");
 	}*/
 
@@ -35,9 +35,9 @@ HomeDevice.prototype.verify = function (trs, sender, cb, scope) {
 }
 
 HomeDevice.prototype.getBytes = function (trs) {
-	return new Buffer(trs.assetDevice.accountId, 'hex');
-	return new Buffer(trs.assetDevice.deviceId, 'hex');
-	return new Buffer(trs.assetDevice.deviceName, 'hex');
+	var b = Buffer.concat([new Buffer(trs.asset.devices.accountId, 'hex'), new Buffer(trs.asset.devices.deviceId, 'hex'), new Buffer(trs.asset.devices.deviceName, 'hex')]);
+
+	return b;
 }
 
 HomeDevice.prototype.apply = function (trs, sender, cb, scope) {
@@ -81,9 +81,9 @@ HomeDevice.prototype.save = function (trs, cb) {
 		table: "asset_devices",
 		values: {
 			transactionId: trs.id,
-			accountId: trs.assetDevice.accountId,
-			deviceId: trs.assetDevice.deviceId,
-			deviceName: trs.assetDevice.deviceName
+			accountId: trs.asset.devices.accountId,
+			deviceId: trs.asset.devices.deviceId,
+			deviceName: trs.asset.devices.deviceName
 		}
 	}, cb);
 }
@@ -228,7 +228,7 @@ HomeDevice.prototype.getDevices = function (cb, query) {
 
             // Map results to asset object
             var devices = transactions.map(function (tx) { 
-                tx.assetDevice = {
+                tx.asset.devices = {
                 	accountId: new Buffer(tx.accountId, 'hex').toString('utf8'),
                     deviceId: new Buffer(tx.deviceId, 'hex').toString('utf8'),
                     deviceName: new Buffer(tx.deviceName, 'hex').toString('utf8')

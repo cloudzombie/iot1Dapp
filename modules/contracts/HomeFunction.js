@@ -10,7 +10,7 @@ function HomeFunction(cb, _library) {
 
 HomeFunction.prototype.create = function (data, trs) {
 	trs.recipientId = data.recipientId;
-	trs.assetFunction = {
+	trs.asset.functions = {
 		accountId: new Buffer(data.accountId, 'utf8').toString('hex'), // Save as hex string
 		deviceId: new Buffer(data.deviceId, 'utf8').toString('hex'), 
 		functionId: new Buffer(data.functionId, 'utf8').toString('hex'),
@@ -25,10 +25,10 @@ HomeFunction.prototype.calculateFee = function (trs) {
 }
 
 HomeFunction.prototype.verify = function (trs, sender, cb, scope) {
-	/*if (trs.assetFunction.deviceId.length > 40) {
+	/*if (trs.asset.functions.deviceId.length > 40) {
 		return setImmediate(cb, "Max length of an device id is 20 characters!");
 	}
-	if (trs.assetFunction.deviceName.length > 100) {
+	if (trs.asset.functions.deviceName.length > 100) {
 		return setImmediate(cb, "Max length of an device name is 50 characters!");
 	}*/
 
@@ -36,10 +36,9 @@ HomeFunction.prototype.verify = function (trs, sender, cb, scope) {
 }
 
 HomeFunction.prototype.getBytes = function (trs) {
-	return new Buffer(trs.assetFunction.accountId, 'hex');
-	return new Buffer(trs.assetFunction.deviceId, 'hex');
-	return new Buffer(trs.assetFunction.functionId, 'hex');
-	return new Buffer(trs.assetFunction.functionName, 'hex');
+	var b = Buffer.concat([new Buffer(trs.asset.functions.accountId, 'hex'), new Buffer(trs.asset.functions.deviceId, 'hex'), new Buffer(trs.asset.functions.functionId, 'hex'), new Buffer(trs.asset.functions.functionName, 'hex')]);
+
+	return b;
 }
 
 HomeFunction.prototype.apply = function (trs, sender, cb, scope) {
@@ -83,10 +82,10 @@ HomeFunction.prototype.save = function (trs, cb) {
 		table: "asset_functions",
 		values: {
 			transactionId: trs.id,
-			accountId: trs.assetFunction.accountId,
-			deviceId: trs.assetFunction.deviceId,
-			functionId: trs.assetFunction.functionId,
-			functionName: trs.assetFunction.functionName
+			accountId: trs.asset.functions.accountId,
+			deviceId: trs.asset.functions.deviceId,
+			functionId: trs.asset.functions.functionId,
+			functionName: trs.asset.functions.functionName
 		}
 	}, cb);
 }
@@ -243,7 +242,7 @@ HomeFunction.prototype.getFunctions = function (cb, query) {
 
             // Map results to asset object
             var functions = transactions.map(function (tx) { 
-                tx.assetFunction = {
+                tx.asset.functions = {
                 	accountId: new Buffer(tx.accountId, 'hex').toString('utf8'),
                     deviceId: new Buffer(tx.deviceId, 'hex').toString('utf8'),
                     functionId: new Buffer(tx.functionId, 'hex').toString('utf8'),
